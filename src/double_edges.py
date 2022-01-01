@@ -63,7 +63,6 @@ def add_augmenting_path_to_graph(graph, min_weight_pairs):
     return graph_aug
 
 
-# Need to make sure every node in the resulting graph actually has an even degree.
 def expand_edges(graph_augmented, graph_original):
     """Fix up the new edges in the graph that didn't exist in the original by connecting a string of initial edges.
         returns just the double edges."""

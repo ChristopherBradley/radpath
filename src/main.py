@@ -92,7 +92,7 @@ class Radpath:
     def mouse_press(self, event):
         """If we press somewhere that doesn't yet have a node, then place a node there"""
         node = (event.x, event.y)
-        self.new_node = self.node_is_new(node)
+        self.new_node = self.overlapping_node(node) is None
         if self.new_node:
             circle = self.draw_node(node)
             self.nodes.append(node)
@@ -107,60 +107,55 @@ class Radpath:
         self.last_line = self.canvas.create_line(self.last_press[0], self.last_press[1], event.x, event.y)
 
     def mouse_release(self, event):
-        """Create a new node if there wasn't one. Then create a new edge if there wasn't one."""
-        node = self.snap_to_node(event)
-        edge = [self.last_press, node]
-        reverse_edge = [node, self.last_press]
-        if not self.new_node and edge[0] == edge[1]:
-            # TODO: Need to make sure I can still create new nodes
-            edge_nodes = [node for edge in self.edges for node in edge]
-            if node not in edge_nodes:
-                # Remove the node
-                index = self.nodes.index(node)
+        """Create and delete a node and or edge based on this logic:
+            1. if the 1st and 2nd nodes are the same and the 1st node is new then ignore it, otherwise delete it
+            2. if the second node is new then create and draw it, if not then centre it
+            3. if the edge is old then delete it, if not then create and draw it"""
+        node1 = self.last_press
+        node2 = (event.x, event.y)
+        node2_centred = self.overlapping_node(node2)
+
+        # 1. if the 1st and 2nd nodes are the same and the 1st node is new then ignore it, otherwise delete it
+        if node1 == node2_centred:
+            if self.new_node:
+                return
+            else: 
+                index = self.nodes.index(node1)
                 del self.nodes[index]
                 self.canvas.delete(self.node_drawings[index])
                 del self.node_drawings[index]
-        elif edge not in self.edges and reverse_edge not in self.edges and edge[0] != edge[1]:
-            # Add the edge
-            line = self.canvas.create_line(edge[0][0], edge[0][1], edge[1][0], edge[1][1])
-            self.edges.append(edge)
-            self.edge_drawings.append(line)
+
+        # 2. if the second node is new then create and draw it, if not then centre it
+        if node2_centred is None:
+            circle = self.draw_node(node2)
+            self.nodes.append(node2)
+            self.node_drawings.append(circle)
         else:
-            # Remove the edge
-            # TODO: Found an error here where I could not index the error. Need to figure out how to reproduce
-            index = self.edges.index(edge if edge in self.edges else reverse_edge)
+            node2 = node2_centred
+
+        # 3. if the edge is old then delete it, if not then create and draw it
+        edge = [node1,node2]
+        reverse_edge = [node2, node1]
+        if edge in self.edges or reverse_edge in self.edges:
+            edge = edge if edge in self.edges else reverse_edge
+            index = self.edges.index(edge)
             del self.edges[index]
             self.canvas.delete(self.edge_drawings[index])
             del self.edge_drawings[index]
-            # TODO: I also need to delete the number
+        else:
+            line = self.canvas.create_line(edge[0][0], edge[0][1], edge[1][0], edge[1][1])
+            self.edges.append(edge)
+            self.edge_drawings.append(line)
+
         self.canvas.delete(self.last_line)
 
-    def node_is_new(self, node):
-        """Checks if we already have a node that covers this position"""
-        for old_node in self.nodes:
-            euclidian_distance = np.sqrt(np.square(node[0] - old_node[0]) + np.square(node[1] - old_node[1]))
-            if euclidian_distance < CIRCLE_SIZE:
-                return False
-        return True
-
     def overlapping_node(self, node):
-        """returns the centre coordinates of the node that overlaps"""
+        """returns the centre coordinates of the node that overlaps, or None if none overlap"""
         for old_node in self.nodes:
             euclidian_distance = np.sqrt(np.square(node[0] - old_node[0]) + np.square(node[1] - old_node[1]))
             if euclidian_distance < CIRCLE_SIZE:
                 return old_node
         return None
-
-    def snap_to_node(self, event):
-        """Create a new node, or return an existing node if it overlaps"""
-        node = (event.x, event.y)
-        if self.node_is_new(node):
-            circle = self.draw_node(node)
-            self.nodes.append(node)
-            self.node_drawings.append(circle)
-        else:
-            node = self.overlapping_node(node)
-        return node
 
     def draw_node(self, node):
         """Draw the node centred at the coordinate"""
@@ -171,8 +166,8 @@ class Radpath:
     def calculate_route(self, event):
         """Make the edges that need to be repeated get drawn in bold"""
         print("Enter pressed")
-        for number in self.number_drawings:
-            self.canvas.delete(number)
+        for number_drawing in self.number_drawings:
+            self.canvas.delete(number_drawing)
         self.double_edges = choose_double_edges(self.edges)
 
         # Make the double edges bold
@@ -201,9 +196,9 @@ class Radpath:
             offset_midpoint = (midpoint[0] + x_change, midpoint[1] + y_change)
 
             # self.canvas.create_line(edge[0][0], edge[0][1], edge[1][0], edge[1][1], width=1, fill='black')
-            number = self.canvas.create_text(offset_midpoint[0], offset_midpoint[1], fill="darkblue", font="Times 10 bold",
+            number_drawing = self.canvas.create_text(offset_midpoint[0], offset_midpoint[1], fill="darkblue", font="Times 10 bold",
                                     text=i)
-            self.number_drawings.append(number)
+            self.number_drawings.append(number_drawing)
             used_edges.add(edge)
         # print(f"path: {self.path}")
 
