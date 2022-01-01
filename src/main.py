@@ -7,7 +7,7 @@ from euler_path import euler_path
 
 CIRCLE_SIZE = 10
 DOUBLE_EDGE_WIDTH = 5
-FILENAME = "../data/map.png"
+FILENAME = "data/map.png"
 # PRELOADED_EDGES = [[(484, 468), (431, 422)], [(484, 468), (441, 488)], [(484, 468), (481, 526)], [(481, 526), (404, 549)], [(404, 549), (332, 523)], [(332, 523), (359, 490)], [(359, 490), (400, 499)], [(400, 499), (441, 488)], [(441, 488), (427, 505)], [(427, 505), (400, 499)], [(359, 490), (382, 463)], [(382, 463), (361, 425)], [(382, 463), (431, 422)], [(431, 422), (459, 379)], [(361, 425), (415, 350)], [(415, 350), (459, 379)], [(415, 350), (376, 330)], [(415, 350), (427, 300)], [(427, 300), (397, 300)], [(397, 300), (376, 330)], [(427, 300), (468, 294)], [(468, 294), (470, 357)], [(470, 357), (459, 379)], [(484, 468), (522, 440)], [(522, 440), (506, 415)], [(506, 415), (509, 364)], [(509, 364), (470, 357)], [(522, 440), (545, 418)], [(545, 418), (561, 395)], [(561, 395), (585, 410)], [(481, 526), (510, 547)], [(510, 547), (487, 590)], [(487, 590), (528, 549)], [(528, 549), (510, 547)], [(528, 549), (543, 548)], [(543, 548), (536, 509)], [(543, 548), (587, 540)], [(587, 540), (575, 481)], [(575, 481), (589, 456)], [(545, 418), (585, 410)], [(585, 410), (589, 456)], [(575, 481), (522, 440)], [(589, 456), (630, 467)], [(630, 467), (674, 456)], [(674, 456), (678, 439)], [(727, 472), (661, 507)], [(661, 507), (674, 456)], [(661, 507), (645, 531)], [(645, 531), (620, 536)], [(620, 536), (627, 584)], [(620, 536), (587, 540)], [(627, 584), (685, 573)], [(685, 573), (726, 494)], [(726, 494), (727, 472)], [(727, 472), (737, 456)], [(737, 456), (731, 417)], [(731, 417), (717, 388)], [(717, 388), (703, 349)], [(703, 349), (660, 290)], [(660, 290), (633, 328)], [(633, 328), (619, 321)], [(619, 321), (601, 360)], [(660, 290), (582, 259)], [(582, 259), (550, 249)], [(550, 249), (527, 245)], [(527, 245), (467, 243)], [(383, 236), (311, 332)], [(311, 332), (274, 383)], [(311, 332), (350, 364)], [(350, 364), (376, 330)], [(468, 294), (467, 243)], [(468, 294), (530, 283)], [(530, 283), (527, 245)], [(530, 283), (534, 294)], [(534, 294), (537, 304)], [(537, 304), (518, 309)], [(534, 294), (553, 290)], [(553, 290), (619, 321)], [(633, 328), (654, 348)], [(654, 348), (668, 398)], [(668, 398), (678, 439)], [(668, 398), (717, 388)], [(668, 398), (628, 411)], [(628, 411), (616, 370)], [(616, 370), (601, 360)], [(601, 360), (566, 347)], [(566, 347), (551, 352)], [(551, 352), (561, 395)], [(551, 352), (537, 304)], [(551, 352), (509, 364)], [(585, 410), (604, 418)], [(604, 418), (628, 411)], [(627, 584), (534, 605)], [(534, 605), (488, 609)], [(488, 609), (487, 590)], [(487, 590), (452, 614)], [(452, 614), (455, 590)], [(455, 590), (487, 590)], [(488, 609), (450, 633)], [(450, 633), (452, 614)], [(361, 425), (336, 382)], [(336, 382), (350, 364)], [(450, 633), (434, 645)], [(434, 645), (311, 557)], [(311, 557), (332, 523)], [(332, 523), (307, 499)], [(307, 499), (282, 537)], [(282, 537), (311, 557)], [(307, 499), (278, 466)], [(278, 466), (314, 413)], [(314, 413), (274, 383)], [(274, 383), (237, 433)], [(237, 433), (278, 466)], [(237, 433), (206, 475)], [(206, 475), (247, 508)], [(247, 508), (278, 466)], [(247, 508), (282, 537)], [(314, 413), (336, 382)], [(307, 499), (324, 476)], [(324, 476), (359, 490)], [(324, 476), (334, 437)], [(334, 437), (314, 413)], [(334, 437), (361, 425)], [(427, 241), (427, 300)], [(383, 236), (427, 241)], [(427, 241), (467, 243)]]
 
 
@@ -33,7 +33,7 @@ class Radpath:
         self.canvas.bind('<ButtonPress-1>', self.mouse_press)
         self.canvas.bind('<B1-Motion>', self.mouse_drag)
         self.canvas.bind('<ButtonRelease-1>', self.mouse_release)
-        self.canvas.bind('<KeyPress-Return>', self.show_double_edges)
+        self.canvas.bind('<KeyPress-Return>', self.calculate_route)
         self.canvas.focus_set()
         self.canvas.create_image(0, 0, image=self.background, anchor='nw')
 
@@ -41,7 +41,7 @@ class Radpath:
         self.node_drawings = []
         self.edges = []
         self.edge_drawings = []
-        self.numbers = []
+        self.number_drawings = []
 
         self.double_edges = []
         self.last_press = None
@@ -52,8 +52,8 @@ class Radpath:
             self.preload_edges(PRELOADED_EDGES)
         except:
             pass
-        self.preload_nodes(self.edges)
-        # self.show_double_edges("bla")   # pretend to click return to do the path creation
+        self.initial_nodes(self.edges)
+        # self.show_double_edges("bla")   # for debugging
         root.mainloop()
 
     def rescale_background(self, background_image, screen_width, screen_height):
@@ -78,8 +78,8 @@ class Radpath:
             line = self.canvas.create_line(edge[0][0], edge[0][1], edge[1][0], edge[1][1])
             self.edge_drawings.append(line)
 
-    def preload_nodes(self, edges):
-        """Extract nodes from the edges"""
+    def initial_nodes(self, edges):
+        """Extract nodes from the edges without duplicates. If no edges then the list starts empty"""
         nodes = set()
         for edge in edges:
             nodes.add(edge[0])
@@ -91,8 +91,14 @@ class Radpath:
 
     def mouse_press(self, event):
         """If we press somewhere that doesn't yet have a node, then place a node there"""
-        self.new_node = self.node_is_new((event.x, event.y))
-        node = self.snap_to_node(event)
+        node = (event.x, event.y)
+        self.new_node = self.node_is_new(node)
+        if self.new_node:
+            circle = self.draw_node(node)
+            self.nodes.append(node)
+            self.node_drawings.append(circle)
+        else:
+            node = self.overlapping_node(node)
         self.last_press = node
 
     def mouse_drag(self, event):
@@ -162,10 +168,10 @@ class Radpath:
                                 node[1] + CIRCLE_SIZE / 2)
 
     # Need to handle exceptions, e.g. empty graph
-    def show_double_edges(self, event):
+    def calculate_route(self, event):
         """Make the edges that need to be repeated get drawn in bold"""
         print("Enter pressed")
-        for number in self.numbers:
+        for number in self.number_drawings:
             self.canvas.delete(number)
         self.double_edges = choose_double_edges(self.edges)
 
@@ -197,7 +203,7 @@ class Radpath:
             # self.canvas.create_line(edge[0][0], edge[0][1], edge[1][0], edge[1][1], width=1, fill='black')
             number = self.canvas.create_text(offset_midpoint[0], offset_midpoint[1], fill="darkblue", font="Times 10 bold",
                                     text=i)
-            self.numbers.append(number)
+            self.number_drawings.append(number)
             used_edges.add(edge)
         # print(f"path: {self.path}")
 
