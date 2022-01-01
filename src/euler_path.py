@@ -18,10 +18,6 @@ def euler_path(edges, double_edges):
         if len(possibilities) == 0:
             insertion_index, last_edge = backtrack(insertion_index, ordered_edges, graph.adj)
             possibilities = graph.adj[last_edge[1]]
-
-            # print(f"Loop size: {loop_size}")
-            # loop_size = 0
-
         possibilities = list(prioritise_double_edges(possibilities))
         next_node = choose_next_node(last_edge, possibilities)
         graph.remove_edge(last_edge[1], next_node)
