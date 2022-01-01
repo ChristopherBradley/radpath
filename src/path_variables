@@ -1,6 +1,0 @@
-import os
-from pathlib import Path
-
-currentDirectory = Path(os.path.abspath(os.path.dirname(__file__)))
-
-data_folder = currentDirectory / 'data'
