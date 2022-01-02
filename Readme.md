@@ -20,5 +20,7 @@ pip install numpy scipy pillow networkx
 
 
 Other notes:
-- You can also click on existing edges or click and drag on existing nodes to remove them.
+- You can also click on existing nodes or click and drag on existing edges to remove them.
 - The path will start from the first node you place
+- After pressing Enter, you can save your radpaths by copying the edges.json file to somewhere else
+- You can get an estimate for the length of your radpath by specifying the width of the map in main.py ACTUAL_WIDTH before you generate the radpath.
