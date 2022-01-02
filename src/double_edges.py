@@ -9,6 +9,8 @@ def choose_double_edges(edges):
     """Use a brute force approach to choose the optimal double edges"""
     g = create_graph(edges)
     g_aug = evenify_graph(g)
+    if g_aug is None:
+        return None
     double_edges = expand_edges(g_aug, g)
     return double_edges
 
@@ -27,6 +29,8 @@ def evenify_graph(g):
 
     # Find the shortest distance between any two nodes (using Djikstra)
     distances = get_shortest_paths_distances(g, odd_node_pairs, 'distance')     # If we don't use the distance, then we just get the number of steps
+    if distances is None:
+        return None
 
     # Choose the edges that maximise the overall weight. (without using any node twice)
     # Note: This is a brute force approach, might need to look into a less accurate but more efficient method later
@@ -41,8 +45,10 @@ def get_shortest_paths_distances(graph, pairs, edge_weight_name):
     """Compute shortest distance between each pair of nodes in a graph. Return a dictionary keyed on node pairs (tuples)."""
     distances = {}
     for pair in pairs:
-        # Note: This breaks if the graph is not fully connected. Might want to add an exception
-        distances[pair] = nx.dijkstra_path_length(graph, pair[0], pair[1], weight=edge_weight_name)
+        try:
+            distances[pair] = nx.dijkstra_path_length(graph, pair[0], pair[1], weight=edge_weight_name)
+        except nx.exception.NetworkXNoPath:
+            return None
     return distances
 
 def create_complete_graph(pair_weights):
