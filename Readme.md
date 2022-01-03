@@ -5,6 +5,7 @@ The purpose of this program is to generate a route through an area that covers e
 ## Dependencies
 Python 3.9  
 pip install numpy scipy pillow networkx
+For testing: pip install -e .
 
 ## Usage
 
