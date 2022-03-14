@@ -4,7 +4,7 @@ The purpose of this program is to generate a route through an area that covers e
 
 ## Dependencies
 Python 3.9  
-pip install numpy scipy pillow networkx
+pip install numpy scipy pillow networkx matplotlib
 For testing: pip install -e .
 
 ## Usage
@@ -21,7 +21,7 @@ For testing: pip install -e .
 
 
 Other notes:
-- You can also click on existing nodes or click and drag on existing edges to remove them.
 - The path will start from the first node you place
 - After pressing Enter, you can save your radpaths by copying the edges.json file to somewhere else
 - You can get an estimate for the length of your radpath by specifying the width of the map in main.py ACTUAL_WIDTH before you generate the radpath.
+- You can click on existing nodes or click and drag on existing edges to remove them.

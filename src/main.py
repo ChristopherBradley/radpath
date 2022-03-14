@@ -2,6 +2,7 @@ import tkinter as tk
 from PIL import ImageTk, Image
 import numpy as np
 import json
+import matplotlib.pyplot as plt
 
 from double_edges import choose_double_edges
 from euler_path import euler_path
@@ -12,8 +13,8 @@ DOUBLE_EDGE_WIDTH = 5
 BACKGROUND_FILENAME = data_folder / "map.png"
 EDGES_FILENAME = data_folder / "edges.json"
 
-ACTUAL_WIDTH = 5.6   # Mt Ainslie
-# ACTUAL_WIDTH = 2.8   # Campbell
+ACTUAL_WIDTH = 5.6   # Mt Ainslie & Red hill & Pinnacle
+# ACTUAL_WIDTH = 2.8 # Campbell, Mt Rogers
 # ACTUAL_WIDTH = 1.4 # Aranda bushland
 
 
@@ -192,33 +193,38 @@ class Radpath:
             print("Cannot generate route if the graph is disjoint")
             return
 
-        # Make the double edges bold
-        for edge in self.double_edges:
-            self.canvas.create_line(edge[0][0], edge[0][1], edge[1][0], edge[1][1], width=DOUBLE_EDGE_WIDTH)
-
         self.path = euler_path(self.edges, self.double_edges)
-        used_edges = set()
 
-        for i, edge in enumerate(self.path):
-            midpoint = ((edge[0][0] + edge [1][0])/2, (edge[0][1] + edge [1][1])/2)
-            gradient = np.array(edge[1]) - np.array(edge[0])
-            unit_vector = gradient / np.linalg.norm(gradient)
+        colour_map = plt.get_cmap('tab10').colors
+        colour_ints = [[int(c*255) for c in colour] for colour in colour_map]
+        colour_hex = ["#" + ''.join('%02x'%i for i in colour) for colour in colour_ints]
 
-            rotation_matrix = [[0, 1], [-1, 0]]
-            if edge in used_edges:
-                # Place the number on the other side of the double edge
-                rotation_matrix = [[0, -1], [1, 0]]
-            new_vector = np.dot(rotation_matrix, unit_vector)
+        # Draw each loop in a different colour
+        for i, loop in enumerate(self.path):
+            for edge in loop:
+                self.canvas.create_line(edge[0][0], edge[0][1], edge[1][0], edge[1][1], width=DOUBLE_EDGE_WIDTH, fill=colour_hex[i])
 
-            dist = 5
-            x_change = dist * new_vector[0]
-            y_change = dist * new_vector[1]
-            offset_midpoint = (midpoint[0] + x_change, midpoint[1] + y_change)
+        # Draw the path
+        # for i, edge in enumerate(self.path):
+        #     midpoint = ((edge[0][0] + edge [1][0])/2, (edge[0][1] + edge [1][1])/2)
+        #     gradient = np.array(edge[1]) - np.array(edge[0])
+        #     unit_vector = gradient / np.linalg.norm(gradient)
 
-            number_drawing = self.canvas.create_text(offset_midpoint[0], offset_midpoint[1], fill="darkblue", font="Times 10 bold",
-                                    text=i)
-            self.number_drawings.append(number_drawing)
-            used_edges.add(edge)
+        #     rotation_matrix = [[0, 1], [-1, 0]]
+        #     if edge in used_edges:
+        #         # Place the number on the other side of the double edge
+        #         rotation_matrix = [[0, -1], [1, 0]]
+        #     new_vector = np.dot(rotation_matrix, unit_vector)
+
+        #     dist = 5
+        #     x_change = dist * new_vector[0]
+        #     y_change = dist * new_vector[1]
+        #     offset_midpoint = (midpoint[0] + x_change, midpoint[1] + y_change)
+
+        #     number_drawing = self.canvas.create_text(offset_midpoint[0], offset_midpoint[1], fill="darkblue", font="Times 10 bold",
+        #                             text=i)
+        #     self.number_drawings.append(number_drawing)
+        #     used_edges.add(edge)
 
         # Calculate the total length of the path
         route_length = total_length(self.edges + self.double_edges, self.background.width(), ACTUAL_WIDTH)

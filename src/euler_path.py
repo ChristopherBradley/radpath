@@ -11,6 +11,8 @@ def euler_path(edges, double_edges):
     insertion_index = 1
 
     loop_size = 0
+    current_loop = ordered_edges
+    loops = []
 
     # Choose edges one at a time, and remove them from the graph.
     while(len(graph.edges())) > 0:
@@ -25,7 +27,13 @@ def euler_path(edges, double_edges):
         ordered_edges.insert(insertion_index, last_edge)
         insertion_index += 1
         loop_size += 1
-    return ordered_edges
+        # Start a new loop if we instersect with this loop
+        if next_node in {item for sublist in current_loop for item in sublist}:
+            loops.append(current_loop)
+            current_loop = []
+        current_loop.append(last_edge)
+    return loops
+
 
 def prioritise_double_edges(possibilities):
     """Choose the double edges first to help avoid turning back on yourself"""
