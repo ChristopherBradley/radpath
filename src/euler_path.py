@@ -22,7 +22,7 @@ def euler_path(edges, double_edges):
         if len(possibilities) == 0:
             insertion_index, last_edge = backtrack(insertion_index, ordered_edges, graph.adj)
             possibilities = graph.adj[last_edge[1]]
-            intersections.append(insertion_index)
+            # intersections.append(insertion_index)
         possibilities = list(prioritise_double_edges(possibilities))
         next_node = choose_next_node(last_edge, possibilities)
         graph.remove_edge(last_edge[1], next_node)
@@ -36,11 +36,16 @@ def euler_path(edges, double_edges):
             current_loop = []
         current_loop.append(last_edge)
 
-
     intersections2 = [0] + sorted(intersections) + [len(ordered_edges)]
     diffs = np.diff(intersections2)
-    colours = reduce(operator.concat, [[i]*length for i,length in enumerate(diffs)])
 
+    min_loop_size = 3
+    for i in range(1, len(diffs)):
+        if diffs[i-1] < min_loop_size:
+            diffs[i] = diffs[i] + diffs[i-1]
+    diffs = [diff for diff in diffs if diff > min_loop_size]
+
+    colours = reduce(operator.concat, [[i]*length for i,length in enumerate(diffs)])
     return ordered_edges, colours
 
 

@@ -196,7 +196,8 @@ class Radpath:
         self.path, self.colours = euler_path(self.edges, self.double_edges)
 
         colour_map = plt.get_cmap('tab20').colors
-        colour_ints = [[int(c*255) for c in colour] for colour in colour_map]
+        rainbow = colour_map[6:8] + colour_map[2:6] + colour_map[0:2] + colour_map[8:]
+        colour_ints = [[int(c*255) for c in colour] for colour in rainbow]
         colour_hex = ["#" + ''.join('%02x'%i for i in colour) for colour in colour_ints]
 
         # Draw each edge with it's given colours
