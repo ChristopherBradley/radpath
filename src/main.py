@@ -193,28 +193,32 @@ class Radpath:
             print("Cannot generate route if the graph is disjoint")
             return
 
-        self.path = euler_path(self.edges, self.double_edges)
-        self.path = self.path[1:]   # Not sure why but this is needed to make the map look semi-decent
+        self.path, self.colours = euler_path(self.edges, self.double_edges)
 
-        colour_map = plt.get_cmap('tab10').colors
+        colour_map = plt.get_cmap('tab20').colors
         colour_ints = [[int(c*255) for c in colour] for colour in colour_map]
         colour_hex = ["#" + ''.join('%02x'%i for i in colour) for colour in colour_ints]
 
-        # Draw each loop in a different colour
+        # Draw each edge with it's given colours
         used_edges = set()
-        for i, loop in enumerate(self.path):
-            for edge in loop:
-                gradient = np.array(edge[1]) - np.array(edge[0])
-                unit_vector = gradient / np.linalg.norm(gradient)
-                rotation_matrix = [[0, 1], [-1, 0]]
-                if edge in used_edges:
-                    rotation_matrix = [[0, -1], [1, 0]]
-                new_vector = np.dot(rotation_matrix, unit_vector)
-                dist = 3
-                x_change = dist * new_vector[0]
-                y_change = dist * new_vector[1]
-                self.canvas.create_line(edge[0][0] + x_change, edge[0][1] + y_change, edge[1][0] + x_change, edge[1][1] + y_change, width=DOUBLE_EDGE_WIDTH, fill=colour_hex[i])
-                used_edges.add(edge)                
+        for i, edge in enumerate(self.path):
+            gradient = np.array(edge[1]) - np.array(edge[0])
+            unit_vector = gradient / np.linalg.norm(gradient)
+            rotation_matrix = [[0, 1], [-1, 0]]
+            if edge in used_edges:
+                rotation_matrix = [[0, -1], [1, 0]]
+            new_vector = np.dot(rotation_matrix, unit_vector)
+            dist = 3
+            x_change = dist * new_vector[0]
+            y_change = dist * new_vector[1]
+            self.canvas.create_line(edge[0][0] + x_change,
+                                    edge[0][1] + y_change, 
+                                    edge[1][0] + x_change, 
+                                    edge[1][1] + y_change, 
+                                    width=DOUBLE_EDGE_WIDTH, 
+                                    fill=colour_hex[self.colours[i]])
+            used_edges.add(edge) 
+
         # Calculate the total length of the path
         route_length = total_length(self.edges + self.double_edges, self.background.width(), ACTUAL_WIDTH)
         print(f"Total length is about {round(route_length)}km, based on the 'ACTUAL_WIDTH'")

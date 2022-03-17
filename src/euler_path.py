@@ -1,6 +1,8 @@
 import networkx as nx
 import numpy as np
 from scipy.spatial.distance import cosine
+from functools import reduce
+import operator
 
 def euler_path(edges, double_edges):
     """Create a route through the graph that is easy to follow and avoids turning back on yourself"""
@@ -9,10 +11,10 @@ def euler_path(edges, double_edges):
     ordered_edges = [last_edge[:2]]
     graph.remove_edge(last_edge[0], last_edge[1])
     insertion_index = 1
-
     loop_size = 0
+
     current_loop = ordered_edges
-    loops = []
+    intersections = []
 
     # Choose edges one at a time, and remove them from the graph.
     while(len(graph.edges())) > 0:
@@ -20,6 +22,7 @@ def euler_path(edges, double_edges):
         if len(possibilities) == 0:
             insertion_index, last_edge = backtrack(insertion_index, ordered_edges, graph.adj)
             possibilities = graph.adj[last_edge[1]]
+            intersections.append(insertion_index)
         possibilities = list(prioritise_double_edges(possibilities))
         next_node = choose_next_node(last_edge, possibilities)
         graph.remove_edge(last_edge[1], next_node)
@@ -29,10 +32,16 @@ def euler_path(edges, double_edges):
         loop_size += 1
         # Start a new loop if we instersect with this loop
         if next_node in {item for sublist in current_loop for item in sublist}:
-            loops.append(current_loop)
+            intersections.append(insertion_index)
             current_loop = []
         current_loop.append(last_edge)
-    return loops
+
+
+    intersections2 = [0] + sorted(intersections) + [len(ordered_edges)]
+    diffs = np.diff(intersections2)
+    colours = reduce(operator.concat, [[i]*length for i,length in enumerate(diffs)])
+
+    return ordered_edges, colours
 
 
 def prioritise_double_edges(possibilities):
