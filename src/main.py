@@ -222,7 +222,7 @@ class Radpath:
         self.preload_edges()
 
         # Calculate the total length of the path
-        route_length = total_length(self.edges + self.double_edges, self.background.width(), ACTUAL_WIDTH)
+        route_length = total_length(self.path, self.background.width(), ACTUAL_WIDTH)
         print(f"Total length is about {round(route_length)}km, based on the 'ACTUAL_WIDTH'")
         
         # Save the edges to file
