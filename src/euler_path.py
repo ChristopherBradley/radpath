@@ -15,6 +15,7 @@ def euler_path(edges, double_edges):
 
     current_loop = ordered_edges.copy()
     intersections = []
+    loops = []
 
     # Choose edges one at a time, and remove them from the graph.
     while(len(graph.edges())) > 0:
@@ -22,7 +23,11 @@ def euler_path(edges, double_edges):
         if len(possibilities) == 0:
             insertion_index, last_edge = backtrack(insertion_index, ordered_edges, graph.adj)
             possibilities = graph.adj[last_edge[1]]
-            current_loop = []
+            # Reset the current loop to wherever we were previously
+            for i in range(len(intersections)):
+                if insertion_index < intersections[i]:
+                    current_loop = loops[i]
+                    break
         possibilities = list(prioritise_double_edges(possibilities))
         next_node = choose_next_node(last_edge, possibilities)
         graph.remove_edge(last_edge[1], next_node)
@@ -36,6 +41,7 @@ def euler_path(edges, double_edges):
         # Start a new loop if we intersect with this loop
         if next_node in {item for sublist in current_loop for item in sublist}:
             intersections.append(insertion_index)
+            loops.append(current_loop)
             current_loop = []
             continue
         current_loop.append(last_edge)
