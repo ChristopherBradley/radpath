@@ -218,7 +218,8 @@ class Radpath:
                                     edge[1][1] + y_change, 
                                     width=DOUBLE_EDGE_WIDTH, 
                                     fill=colour_hex[self.colours[i]])
-            used_edges.add(edge) 
+            used_edges.add(edge)
+        self.preload_edges()
 
         # Calculate the total length of the path
         route_length = total_length(self.edges + self.double_edges, self.background.width(), ACTUAL_WIDTH)

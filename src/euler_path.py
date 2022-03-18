@@ -20,6 +20,7 @@ def euler_path(edges, double_edges):
     while(len(graph.edges())) > 0:
         possibilities = graph.adj[last_edge[1]]
         if len(possibilities) == 0:
+            break
             insertion_index, last_edge = backtrack(insertion_index, ordered_edges, graph.adj)
             possibilities = graph.adj[last_edge[1]]
         possibilities = list(prioritise_double_edges(possibilities))
@@ -29,10 +30,12 @@ def euler_path(edges, double_edges):
         ordered_edges.insert(insertion_index, last_edge)
         insertion_index += 1
         loop_size += 1
-        # Start a new loop if we instersect with this loop
+        
+        # Start a new loop if we intersect with this loop
         if next_node in {item for sublist in current_loop for item in sublist}:
             intersections.append(insertion_index)
             current_loop = []
+            continue
         current_loop.append(last_edge)
 
     intersections2 = [0] + sorted(intersections) + [len(ordered_edges)]
