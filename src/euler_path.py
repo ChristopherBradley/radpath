@@ -20,17 +20,19 @@ def euler_path(edges, double_edges):
     while(len(graph.edges())) > 0:
         possibilities = graph.adj[last_edge[1]]
         if len(possibilities) == 0:
-            break
             insertion_index, last_edge = backtrack(insertion_index, ordered_edges, graph.adj)
             possibilities = graph.adj[last_edge[1]]
+            current_loop = []
         possibilities = list(prioritise_double_edges(possibilities))
         next_node = choose_next_node(last_edge, possibilities)
         graph.remove_edge(last_edge[1], next_node)
         last_edge = (last_edge[1], next_node)
         ordered_edges.insert(insertion_index, last_edge)
+
+        intersections = [index if index <= insertion_index else index + 1 for index in intersections]
         insertion_index += 1
         loop_size += 1
-        
+
         # Start a new loop if we intersect with this loop
         if next_node in {item for sublist in current_loop for item in sublist}:
             intersections.append(insertion_index)
@@ -42,7 +44,6 @@ def euler_path(edges, double_edges):
     diffs = np.diff(intersections2)
     colours = reduce(operator.concat, [[i]*length for i,length in enumerate(diffs)])
     return ordered_edges, colours
-
 
 def prioritise_double_edges(possibilities):
     """Choose the double edges first to help avoid turning back on yourself"""
