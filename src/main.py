@@ -44,7 +44,7 @@ class Radpath:
         self.node_drawings = []
         self.edges = []
         self.edge_drawings = []
-        self.number_drawings = []
+        self.loop_drawings = []
 
         self.double_edges = []
         self.last_press = None
@@ -71,6 +71,10 @@ class Radpath:
 
     def preload_edges(self):
         """Load from a previously saved set of edges"""
+        for edge_drawing in self.edge_drawings:
+            self.canvas.delete(edge_drawing)
+        for node_drawing in self.node_drawings:
+            self.canvas.delete(node_drawing)
 
         # Load in the edges from file if the file exists
         try:
@@ -186,8 +190,8 @@ class Radpath:
             print("Cannot calculate route for an empty network")
             return
 
-        for number_drawing in self.number_drawings:
-            self.canvas.delete(number_drawing)
+        for loop_drawing in self.loop_drawings:
+            self.canvas.delete(loop_drawing)
         self.double_edges = choose_double_edges(self.edges)
         if self.double_edges is None:
             print("Cannot generate route if the graph is disjoint")
@@ -195,7 +199,7 @@ class Radpath:
 
         self.path, self.colours = euler_path(self.edges, self.double_edges)
 
-        colour_map = plt.get_cmap('tab20').colors
+        colour_map = plt.get_cmap('tab20').colors * 10
         rainbow = colour_map[6:8] + colour_map[2:6] + colour_map[0:2] + colour_map[8:]
         colour_ints = [[int(c*255) for c in colour] for colour in rainbow]
         colour_hex = ["#" + ''.join('%02x'%i for i in colour) for colour in colour_ints]
@@ -212,14 +216,14 @@ class Radpath:
             dist = 3
             x_change = dist * new_vector[0]
             y_change = dist * new_vector[1]
-            self.canvas.create_line(edge[0][0] + x_change,
+            line = self.canvas.create_line(edge[0][0] + x_change,
                                     edge[0][1] + y_change, 
                                     edge[1][0] + x_change, 
                                     edge[1][1] + y_change, 
                                     width=DOUBLE_EDGE_WIDTH, 
                                     fill=colour_hex[self.colours[i]])
+            self.loop_drawings.append(line)
             used_edges.add(edge)
-        self.preload_edges()
 
         # Calculate the total length of the path
         route_length = total_length(self.path, self.background.width(), ACTUAL_WIDTH)
@@ -228,8 +232,7 @@ class Radpath:
         # Save the edges to file
         with open(EDGES_FILENAME, 'w') as file:
             json.dump(self.edges, file)
-
-
+        self.preload_edges()
 
 def total_length(edges, window_width, real_life_width):
     """Calculate the total length of the route"""

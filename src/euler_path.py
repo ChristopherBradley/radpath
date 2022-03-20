@@ -39,7 +39,11 @@ def euler_path(edges, double_edges):
         loop_size += 1
 
         # Start a new loop if we intersect with this loop
-        if next_node in {item for sublist in current_loop for item in sublist}:
+        # Ensure it isn't in the last 3. 
+        in_current_loop = next_node in {item for sublist in current_loop for item in sublist}
+        intersect_lenience = 5
+        in_last_3 = next_node in {item for sublist in current_loop[-intersect_lenience:] for item in sublist}
+        if in_current_loop and not in_last_3:
             intersections.append(insertion_index)
             loops.append(current_loop)
             current_loop = []
@@ -48,6 +52,7 @@ def euler_path(edges, double_edges):
 
     intersections2 = [0] + sorted(intersections) + [len(ordered_edges)]
     diffs = np.diff(intersections2)
+    # diffs[0] -= 1
     colours = reduce(operator.concat, [[i]*length for i,length in enumerate(diffs)])
     return ordered_edges, colours
 
