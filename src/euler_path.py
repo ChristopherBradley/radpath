@@ -5,7 +5,7 @@ from functools import reduce
 import operator
 
 def euler_path(edges, double_edges):
-    """Create a route through the graph that is easy to follow and avoids turning back on yourself"""
+    """Create a route through the graph that is easy to follow and avoids turning back on itself"""
     graph = create_multi_graph(edges, double_edges)
     last_edge = list(graph.edges)[0]
     ordered_edges = [last_edge[:2]]
@@ -33,17 +33,16 @@ def euler_path(edges, double_edges):
         graph.remove_edge(last_edge[1], next_node)
         last_edge = (last_edge[1], next_node)
         ordered_edges.insert(insertion_index, last_edge)
-
+        
         intersections = [index if index <= insertion_index else index + 1 for index in intersections]
         insertion_index += 1
         loop_size += 1
 
-        # Start a new loop if we intersect with this loop
-        # Ensure it isn't in the last 3. 
+        # Start a new loop if we intersect with this loop and the intersection results in a loop larger than intersect_lenience + 1
         in_current_loop = next_node in {item for sublist in current_loop for item in sublist}
         intersect_lenience = 5
-        in_last_3 = next_node in {item for sublist in current_loop[-intersect_lenience:] for item in sublist}
-        if in_current_loop and not in_last_3:
+        in_last_n = next_node in {item for sublist in current_loop[-intersect_lenience:] for item in sublist}
+        if in_current_loop and not in_last_n:
             intersections.append(insertion_index)
             loops.append(current_loop)
             current_loop = []
@@ -52,7 +51,6 @@ def euler_path(edges, double_edges):
 
     intersections2 = [0] + sorted(intersections) + [len(ordered_edges)]
     diffs = np.diff(intersections2)
-    # diffs[0] -= 1
     colours = reduce(operator.concat, [[i]*length for i,length in enumerate(diffs)])
     return ordered_edges, colours
 

@@ -13,9 +13,15 @@ DOUBLE_EDGE_WIDTH = 5
 BACKGROUND_FILENAME = data_folder / "map.png"
 EDGES_FILENAME = data_folder / "edges.json"
 
-ACTUAL_WIDTH = 5.6   # Mt Ainslie & Red hill & Pinnacle
-# ACTUAL_WIDTH = 2.8 # Campbell, Mt Rogers
+# ACTUAL_WIDTH = 5.6   # Pinnacle
+# ACTUAL_WIDTH = 2.7 # Black Mountain
+# ACTUAL_WIDTH = 3.1 # Red Hill
+# ACTUAL_WIDTH = 3.4 # Ainslie
+ACTUAL_WIDTH = 3.1 # New Campbell
+# ACTUAL_WIDTH = 2.8 # Campbell, Mt Rogers, Civic
 # ACTUAL_WIDTH = 1.4 # Aranda bushland
+# ACTUAL_WIDTH = 0.7 # Botanic gardens
+# ACTUAL_WIDTH = 0.75 # Botanic gardens
 
 
 class Radpath:
@@ -68,14 +74,16 @@ class Radpath:
             image_width = image_height * image_ratio
         background_image = background_image.resize((int(image_width), int(image_height)), Image.ANTIALIAS)
         return background_image
-
-    def preload_edges(self):
-        """Load from a previously saved set of edges"""
+    
+    def clear_nodes_and_edges(self):
         for edge_drawing in self.edge_drawings:
             self.canvas.delete(edge_drawing)
         for node_drawing in self.node_drawings:
             self.canvas.delete(node_drawing)
 
+    def preload_edges(self):
+        """Load from a previously saved set of edges"""
+        self.clear_nodes_and_edges()
         # Load in the edges from file if the file exists
         try:
             with open(EDGES_FILENAME, 'r') as file:
