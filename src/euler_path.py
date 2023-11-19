@@ -23,11 +23,12 @@ def euler_path(edges, double_edges):
         if len(possibilities) == 0:
             insertion_index, last_edge = backtrack(insertion_index, ordered_edges, graph.adj)
             possibilities = graph.adj[last_edge[1]]
+            # What was this for loop doing?
             # Reset the current loop to wherever we were previously
-            for i in range(len(intersections)):
-                if insertion_index < intersections[i]:
-                    current_loop = loops[i]
-                    break
+            # for i in range(len(intersections)):
+            #     if insertion_index < intersections[i]:
+            #         current_loop = loops[i]
+            #         break
         possibilities = list(prioritise_double_edges(possibilities))
         next_node = choose_next_node(last_edge, possibilities)
         graph.remove_edge(last_edge[1], next_node)
@@ -44,6 +45,7 @@ def euler_path(edges, double_edges):
         in_last_n = next_node in {item for sublist in current_loop[-intersect_lenience:] for item in sublist}
         if in_current_loop and not in_last_n:
             intersections.append(insertion_index)
+            current_loop.append(last_edge)
             loops.append(current_loop)
             current_loop = []
             continue
