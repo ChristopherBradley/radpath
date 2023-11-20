@@ -17,8 +17,9 @@ EDGES_FILENAME = data_folder / "edges.json"
 # ACTUAL_WIDTH = 2.7 # Black Mountain
 # ACTUAL_WIDTH = 3.1 # Red Hill
 # ACTUAL_WIDTH = 3.4 # Ainslie
-ACTUAL_WIDTH = 3.1 # New Campbell
+# ACTUAL_WIDTH = 3.1 # New Campbell
 # ACTUAL_WIDTH = 2.8 # Campbell, Mt Rogers, Civic
+ACTUAL_WIDTH = 2.16 # ANU Defibrillators
 # ACTUAL_WIDTH = 1.4 # Aranda bushland
 # ACTUAL_WIDTH = 0.7 # Botanic gardens
 # ACTUAL_WIDTH = 0.75 # Botanic gardens
@@ -235,32 +236,32 @@ class Radpath:
             used_edges.add(edge)
 
         # Draw numbers on the edges for debugging
-        for i, edge in enumerate(self.path):
-            midpoint = ((edge[0][0] + edge [1][0])/2, (edge[0][1] + edge [1][1])/2)
-            gradient = np.array(edge[1]) - np.array(edge[0])
-            unit_vector = gradient / np.linalg.norm(gradient)
+        # for i, edge in enumerate(self.path):
+        #     midpoint = ((edge[0][0] + edge [1][0])/2, (edge[0][1] + edge [1][1])/2)
+        #     gradient = np.array(edge[1]) - np.array(edge[0])
+        #     unit_vector = gradient / np.linalg.norm(gradient)
 
-            rotation_matrix = [[0, 1], [-1, 0]]
-            if edge in used_edges:
-                # Place the number on the other side of the double edge
-                rotation_matrix = [[0, -1], [1, 0]]
-            new_vector = np.dot(rotation_matrix, unit_vector)
+        #     rotation_matrix = [[0, 1], [-1, 0]]
+        #     if edge in used_edges:
+        #         # Place the number on the other side of the double edge
+        #         rotation_matrix = [[0, -1], [1, 0]]
+        #     new_vector = np.dot(rotation_matrix, unit_vector)
 
-            dist = 5
-            x_change = dist * new_vector[0]
-            y_change = dist * new_vector[1]
-            offset_midpoint = (midpoint[0] + x_change, midpoint[1] + y_change)
+        #     dist = 5
+        #     x_change = dist * new_vector[0]
+        #     y_change = dist * new_vector[1]
+        #     offset_midpoint = (midpoint[0] + x_change, midpoint[1] + y_change)
 
-            # Use this line to draw a number on each edge
-            number_drawing = self.canvas.create_text(offset_midpoint[0], offset_midpoint[1], fill="orange", font="Times 10 bold",
-                text=i)   
+        #     # Use this line to draw a number on each edge
+        #     number_drawing = self.canvas.create_text(offset_midpoint[0], offset_midpoint[1], fill="orange", font="Times 10 bold",
+        #         text=i)   
             
-            # Use this line to draw the coordinate of each node
-            number_drawing = self.canvas.create_text(edge[0][0], edge[0][1], fill="darkblue", font="Times 10 bold",
-                text=edge[0])   
+        #     # Use this line to draw the coordinate of each node
+        #     number_drawing = self.canvas.create_text(edge[0][0], edge[0][1], fill="darkblue", font="Times 10 bold",
+        #         text=edge[0])   
             
-            self.number_drawings.append(number_drawing)
-            used_edges.add(edge)
+        #     self.number_drawings.append(number_drawing)
+        #     used_edges.add(edge)
 
         # Calculate the total length of the path
         route_length = total_length(self.path, self.background.width(), ACTUAL_WIDTH)
