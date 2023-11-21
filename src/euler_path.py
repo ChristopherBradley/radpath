@@ -51,16 +51,20 @@ def euler_path(edges, double_edges):
 def separate_loops(ordered_edges):
     """Give each loop a separate index for determining colours"""
     nodes = [edge[0] for edge in ordered_edges]
-    current_loop = []
+    colour_dict = {0:[]}
+    current_loop = []   
     colours = []
     loop_number = 0
     lenience = 5
     for node in nodes:
-        if node in current_loop and node not in current_loop[-lenience:]:
-            loop_number += 1
+        if node in colour_dict[loop_number] and node not in current_loop[-lenience:]:
+            loop_number = (loop_number + 1) % 20
             current_loop = []
         colours.append(loop_number)
         current_loop.append(node)
+        if loop_number not in colour_dict:
+            colour_dict[loop_number] = []
+        colour_dict[loop_number].append(node)
     return colours
 
 def prioritise_double_edges(possibilities):
