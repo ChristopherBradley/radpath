@@ -65,6 +65,10 @@ def separate_loops(ordered_edges):
         if loop_number not in colour_dict:
             colour_dict[loop_number] = []
         colour_dict[loop_number].append(node)
+
+    # Make each loop end one short to avoid colours running into each other
+    colours.append(loop_number)
+    colours = colours[1:]
     return colours
 
 def prioritise_double_edges(possibilities):
