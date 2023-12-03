@@ -223,34 +223,36 @@ class Radpath:
             self.loop_drawings.append(line)
             used_edges.add(edge)
 
+        debug = False
         # # Draw numbers on the edges
-        # for i, edge in enumerate(self.path):
-        #     # Only draw the edge number if this is the start of a new loop
-        #     midpoint = ((edge[0][0] + edge [1][0])/2, (edge[0][1] + edge [1][1])/2)
-        #     gradient = np.array(edge[1]) - np.array(edge[0])
-        #     unit_vector = gradient / np.linalg.norm(gradient)
+        if debug == True:
+            for i, edge in enumerate(self.path):
+                # Only draw the edge number if this is the start of a new loop
+                midpoint = ((edge[0][0] + edge [1][0])/2, (edge[0][1] + edge [1][1])/2)
+                gradient = np.array(edge[1]) - np.array(edge[0])
+                unit_vector = gradient / np.linalg.norm(gradient)
 
-        #     rotation_matrix = [[0, 1], [-1, 0]]
-        #     if edge in used_edges:
-        #         # Place the number on the other side of the double edge
-        #         rotation_matrix = [[0, -1], [1, 0]]
-        #     new_vector = np.dot(rotation_matrix, unit_vector)
+                rotation_matrix = [[0, 1], [-1, 0]]
+                if edge in used_edges:
+                    # Place the number on the other side of the double edge
+                    rotation_matrix = [[0, -1], [1, 0]]
+                new_vector = np.dot(rotation_matrix, unit_vector)
 
-        #     dist = 5
-        #     x_change = dist * new_vector[0]
-        #     y_change = dist * new_vector[1]
-        #     offset_midpoint = (midpoint[0] + x_change, midpoint[1] + y_change)
+                dist = 5
+                x_change = dist * new_vector[0]
+                y_change = dist * new_vector[1]
+                offset_midpoint = (midpoint[0] + x_change, midpoint[1] + y_change)
 
-        #     # Use this line to draw a number on each edge
-        #     number_drawing = self.canvas.create_text(offset_midpoint[0], offset_midpoint[1], fill="black", font="Times 16 bold",
-        #         text=i)   
-            
-        #     ## Use this line to draw the coordinate of each node
-        #     # number_drawing = self.canvas.create_text(edge[0][0], edge[0][1], fill="darkblue", font="Times 10 bold",
-        #     #     text=edge[0])   
-            
-        #     self.number_drawings.append(number_drawing)
-        #     used_edges.add(edge)
+                # Use this line to draw a number on each edge
+                number_drawing = self.canvas.create_text(offset_midpoint[0], offset_midpoint[1], fill="orange", font="Times 8",
+                    text=i)   
+                
+                ## Use this line to draw the coordinate of each node
+                number_drawing = self.canvas.create_text(edge[0][0], edge[0][1], fill="darkblue", font="Times 8",
+                    text=edge[0])   
+                
+                self.number_drawings.append(number_drawing)
+                used_edges.add(edge)
 
         # Calculate the total length of the path
         route_length = total_length(self.path, self.background.width())
