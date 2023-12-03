@@ -13,18 +13,6 @@ DOUBLE_EDGE_WIDTH = 5
 BACKGROUND_FILENAME = data_folder / "map.png"
 EDGES_FILENAME = data_folder / "edges.json"
 
-# ACTUAL_WIDTH = 5.6   # Pinnacle
-# ACTUAL_WIDTH = 2.7 # Black Mountain
-# ACTUAL_WIDTH = 3.1 # Red Hill
-# ACTUAL_WIDTH = 3.4 # Ainslie
-# ACTUAL_WIDTH = 3.1 # New Campbell
-# ACTUAL_WIDTH = 2.8 # Campbell, Mt Rogers, Civic
-ACTUAL_WIDTH = 2.16 # ANU Defibrillators
-# ACTUAL_WIDTH = 1.4 # Aranda bushland
-# ACTUAL_WIDTH = 0.7 # Botanic gardens
-# ACTUAL_WIDTH = 0.75 # Botanic gardens
-
-
 class Radpath:
 
     # We need this to be a class so that we can access the canvas from outside functions
@@ -265,20 +253,20 @@ class Radpath:
         #     used_edges.add(edge)
 
         # Calculate the total length of the path
-        route_length = total_length(self.path, self.background.width(), ACTUAL_WIDTH)
-        print(f"Total length is about {round(route_length)}km, based on the 'ACTUAL_WIDTH'")
+        route_length = total_length(self.path, self.background.width())
+        print(f"Total distance is roughly the width of the map x {round(route_length, 1)}")
         
         # Save the edges to file
         with open(EDGES_FILENAME, 'w') as file:
             json.dump(self.edges, file)
         self.preload_edges()
 
-def total_length(edges, window_width, real_life_width):
+def total_length(edges, window_width):
     """Calculate the total length of the route"""
     total_length = 0
     for edge in edges:
         total_length += np.linalg.norm(np.array(edge[0]) - np.array(edge[1]))   # Euclidean distance
-    scaling_factor = real_life_width / window_width
+    scaling_factor = 1 / window_width
     actual_length = total_length * scaling_factor
     return actual_length
 
