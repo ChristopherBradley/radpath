@@ -191,10 +191,6 @@ class Radpath:
         for loop_drawing in self.loop_drawings:
             self.canvas.delete(loop_drawing)
         self.double_edges = choose_double_edges(self.edges)
-        if self.double_edges is None:
-            print("Cannot generate route if the graph is disjoint")
-            return
-
         self.path, self.colours = euler_path(self.edges, self.double_edges)
 
         colour_map = plt.get_cmap('tab20').colors * 10

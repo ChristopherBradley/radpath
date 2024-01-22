@@ -24,7 +24,11 @@ def euler_path(edges, double_edges):
             insertion_index, last_edge = backtrack(insertion_index, ordered_edges, graph.adj)
             possibilities = graph.adj[last_edge[1]]
         possibilities = list(prioritise_double_edges(possibilities))
-        next_node = choose_next_node(last_edge, possibilities)
+        try:
+            next_node = choose_next_node(last_edge, possibilities)
+        except:
+            print("Error likely due to the graph being disjoint. Please make sure everything is connected.")
+            return [], []
         graph.remove_edge(last_edge[1], next_node)
         last_edge = (last_edge[1], next_node)
         ordered_edges.insert(insertion_index, last_edge)

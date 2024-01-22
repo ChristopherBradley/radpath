@@ -10,7 +10,7 @@ def choose_double_edges(edges):
     g = create_graph(edges)
     g_aug = evenify_graph(g)
     if g_aug is None:
-        return None
+        return []
     double_edges = expand_edges(g_aug, g)
     return double_edges
 
@@ -29,7 +29,7 @@ def evenify_graph(g):
 
     # Find the shortest distance between any two nodes (using Djikstra)
     distances = get_shortest_paths_distances(g, odd_node_pairs, 'distance')     # If we don't use the distance, then we just get the number of steps
-    if distances is None:
+    if distances is None or len(distances) == 0:
         return None
 
     # Choose the edges that maximise the overall weight. (without using any node twice)
