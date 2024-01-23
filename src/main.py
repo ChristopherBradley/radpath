@@ -43,14 +43,10 @@ class Radpath:
         button_height = 1
         button_width = 10
 
-        button1 = tk.Button(root, text="Upload Basemap", command=self.UploadAction, font=button_font, highlightbackground=button_background, height=button_height, width=button_width)
-        button1.grid(row=0, column=0, padx=10, pady=10, sticky="nw")
-        # button2 = tk.Button(root, text="Upload Edges", command=self.print_hello, font=button_font,  highlightbackground=button_background, height=button_height, width=button_width)
-        # button2.grid(row=0, column=0, padx=10, pady=50, sticky="nw")
         button3 = tk.Button(root, text="Generate Route", command=self.calculate_route, font=button_font, highlightbackground=button_background, height=button_height, width=button_width)
         button3.grid(row=0, column=0, padx=10, pady=90, sticky="nw")
-        # button4 = tk.Button(root, text="Download Route", command=self.print_hello, font=button_font, highlightbackground=button_background, height=button_height, width=button_width)
-        # button4.grid(row=0, column=0, padx=10, pady=130, sticky="nw")
+        self.message_label = tk.Label(root, text="Testing...", bg="white")
+        self.message_label.grid(row=0, column=0, padx=10, pady=120, sticky="nw")
 
         self.nodes = []
         self.node_drawings = []
@@ -227,6 +223,9 @@ class Radpath:
         self.double_edges = choose_double_edges(self.edges)
         self.path, self.colours = euler_path(self.edges, self.double_edges)
 
+        if self.path is None:
+            self.message_label.config(text="Error: disjoint graph", bg="#fcdddc")
+
         colour_map = plt.get_cmap('tab20').colors * 10
         rainbow = colour_map[6:8] + colour_map[2:6] + colour_map[0:2] + colour_map[8:]
         colour_ints = [[int(c*255) for c in colour] for colour in rainbow]
@@ -286,7 +285,7 @@ class Radpath:
 
         # Calculate the total length of the path
         route_length = total_length(self.path, self.background.width())
-        print(f"Generated Route: Total distance is roughly the width of the map x {round(route_length, 1)}")
+        self.message_label.config(text=f'distance = map width x {round(route_length, 1)}', bg="#d9ffe0")
         
         # Save the edges to file
         with open(EDGES_FILENAME, 'w') as file:
