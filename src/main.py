@@ -66,25 +66,16 @@ class Radpath:
         return background_image
     
     def clear_nodes_and_edges(self):
+        """Clear all the drawings"""
         for edge_drawing in self.edge_drawings:
             self.canvas.delete(edge_drawing)
         for node_drawing in self.node_drawings:
             self.canvas.delete(node_drawing)
+        self.edge_drawings = []
+        self.node_drawings = []
 
-    def preload_edges(self):
-        """Load from a previously saved set of edges"""
-        self.clear_nodes_and_edges()
-        # Load in the edges from file if the file exists
-        try:
-            with open(EDGES_FILENAME, 'r') as file:
-                self.edges = json.load(file)
-                # Nodes need to be tuples for dictionary hashing to work
-                self.edges = [[tuple(edge[0]),tuple(edge[1])] for edge in self.edges]
-        except:
-            print("There is no edges.json file for preloading, so we are starting from scratch")
-            return
-
-        # Draw the edges
+    def draw_nodes_and_edges(self):
+        "Draw all the drawings"
         for edge in self.edges:
             line = self.canvas.create_line(edge[0][0], edge[0][1], edge[1][0], edge[1][1])
             self.edge_drawings.append(line)
@@ -99,8 +90,30 @@ class Radpath:
             circle = self.draw_node(node)
             self.node_drawings.append(circle)
 
+    def preload_edges(self):
+        """Load from a previously saved set of edges"""
+        self.clear_nodes_and_edges()
+        # Load in the edges from file if the file exists
+        try:
+            with open(EDGES_FILENAME, 'r') as file:
+                self.edges = json.load(file)
+                # Nodes need to be tuples for dictionary hashing to work
+                self.edges = [[tuple(edge[0]),tuple(edge[1])] for edge in self.edges]
+        except:
+            print("There is no edges.json file for preloading, so we are starting from scratch")
+            return
+        self.draw_nodes_and_edges()
+
     def mouse_press(self, event):
         """If we press somewhere that doesn't yet have a node, then place a node there"""
+        # 0. Clear the old route if we start editing the nodes/edges
+        if self.loop_drawings != []:
+            for loop_drawing in self.loop_drawings:
+                self.canvas.delete(loop_drawing)
+            self.loop_drawings = []
+            self.clear_nodes_and_edges()
+            self.draw_nodes_and_edges()
+
         node = (event.x, event.y)
         self.new_node = self.overlapping_node(node) is None
         if self.new_node:
@@ -181,15 +194,12 @@ class Radpath:
         return self.canvas.create_oval(node[0] - CIRCLE_SIZE / 2, node[1] - CIRCLE_SIZE / 2, node[0] + CIRCLE_SIZE / 2,
                                 node[1] + CIRCLE_SIZE / 2)
 
-    # Need to handle exceptions, e.g. empty graph
     def calculate_route(self, event):
         """Make the edges that need to be repeated get drawn in bold"""
         if self.edges == []:
             print("Cannot calculate route for an empty network")
             return
 
-        for loop_drawing in self.loop_drawings:
-            self.canvas.delete(loop_drawing)
         self.double_edges = choose_double_edges(self.edges)
         self.path, self.colours = euler_path(self.edges, self.double_edges)
 
@@ -252,7 +262,7 @@ class Radpath:
 
         # Calculate the total length of the path
         route_length = total_length(self.path, self.background.width())
-        print(f"Total distance is roughly the width of the map x {round(route_length, 1)}")
+        print(f"Generated Route: Total distance is roughly the width of the map x {round(route_length, 1)}")
         
         # Save the edges to file
         with open(EDGES_FILENAME, 'w') as file:
