@@ -1,4 +1,6 @@
 import tkinter as tk
+from tkinter import font as tkFont
+from tkinter import filedialog
 from PIL import ImageTk, Image
 import numpy as np
 import json
@@ -18,6 +20,8 @@ class Radpath:
     # We need this to be a class so that we can access the canvas from outside functions
     def __init__(self):
         root = tk.Tk()
+        root.title("Radpath")
+
         # With this current system, you need to enter full screen mode for it to work properly
         screen_width = root.winfo_screenwidth()
         screen_height = root.winfo_screenheight()
@@ -31,9 +35,22 @@ class Radpath:
         self.canvas.bind('<ButtonPress-1>', self.mouse_press)
         self.canvas.bind('<B1-Motion>', self.mouse_drag)
         self.canvas.bind('<ButtonRelease-1>', self.mouse_release)
-        self.canvas.bind('<KeyPress-Return>', self.calculate_route)
         self.canvas.focus_set()
         self.canvas.create_image(0, 0, image=self.background, anchor='nw')
+
+        button_font = tkFont.Font(size=16, weight='bold')
+        button_background = 'black'
+        button_height = 1
+        button_width = 10
+
+        button1 = tk.Button(root, text="Upload Basemap", command=self.UploadAction, font=button_font, highlightbackground=button_background, height=button_height, width=button_width)
+        button1.grid(row=0, column=0, padx=10, pady=10, sticky="nw")
+        # button2 = tk.Button(root, text="Upload Edges", command=self.print_hello, font=button_font,  highlightbackground=button_background, height=button_height, width=button_width)
+        # button2.grid(row=0, column=0, padx=10, pady=50, sticky="nw")
+        button3 = tk.Button(root, text="Generate Route", command=self.calculate_route, font=button_font, highlightbackground=button_background, height=button_height, width=button_width)
+        button3.grid(row=0, column=0, padx=10, pady=90, sticky="nw")
+        # button4 = tk.Button(root, text="Download Route", command=self.print_hello, font=button_font, highlightbackground=button_background, height=button_height, width=button_width)
+        # button4.grid(row=0, column=0, padx=10, pady=130, sticky="nw")
 
         self.nodes = []
         self.node_drawings = []
@@ -49,6 +66,13 @@ class Radpath:
 
         self.preload_edges()
         root.mainloop()
+
+    def print_hello(self):
+        print("Hello, World!")
+
+    def UploadAction(event=None):
+        filename = filedialog.askopenfilename()
+        print('Selected:', filename)
 
     def rescale_background(self, background_image, screen_width, screen_height):
         """Adjust the image size to use the full screen width/height but without distorting the image"""
@@ -194,7 +218,7 @@ class Radpath:
         return self.canvas.create_oval(node[0] - CIRCLE_SIZE / 2, node[1] - CIRCLE_SIZE / 2, node[0] + CIRCLE_SIZE / 2,
                                 node[1] + CIRCLE_SIZE / 2)
 
-    def calculate_route(self, event):
+    def calculate_route(self):
         """Make the edges that need to be repeated get drawn in bold"""
         if self.edges == []:
             print("Cannot calculate route for an empty network")
