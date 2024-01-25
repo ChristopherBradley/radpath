@@ -3,8 +3,8 @@ This app aims to generate a nice route through every path on a map.
 
 ## Dependencies
 Python 3.9  
-pip install numpy scipy pillow networkx matplotlib
-brew install ghostscript  
+pip install numpy scipy pillow networkx matplotlib  
+brew install ghostscript
 
 ## Usage
  
