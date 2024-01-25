@@ -43,9 +43,10 @@ class Radpath:
         button_height = 1
         button_width = 10
 
-        button1 = tk.Button(root, text="Upload Basemap", command=self.UploadAction, font=button_font, highlightbackground=button_background, height=button_height, width=button_width)
+        button1 = tk.Button(root, text="Upload Basemap", command=self.upload_basemap, font=button_font, highlightbackground=button_background, height=button_height, width=button_width)
         button1.grid(row=0, column=0, padx=10, pady=10, sticky="nw")
-
+        button2 = tk.Button(root, text="Upload Edges", command=self.upload_edges, font=button_font, highlightbackground=button_background, height=button_height, width=button_width)
+        button2.grid(row=0, column=0, padx=10, pady=50, sticky="nw")
         button3 = tk.Button(root, text="Generate Route", command=self.calculate_route, font=button_font, highlightbackground=button_background, height=button_height, width=button_width)
         button3.grid(row=0, column=0, padx=10, pady=90, sticky="nw")
         self.message_label = tk.Label(root, text="")
@@ -66,16 +67,17 @@ class Radpath:
         self.preload_edges()
         root.mainloop()
 
-    def UploadAction(self):
+    def upload_basemap(self):
         """Override the current map.png with the new image"""
         filename = filedialog.askopenfilename()
+        # TODO: Check the file is a png, and if not then give an error message
         shutil.copy(filename, data_folder)
         old_filename = os.path.join(data_folder, os.path.basename(filename))
         new_filename = os.path.join(data_folder, "map.png")
         os.rename(old_filename, new_filename)
         self.background = self.setup_background(BACKGROUND_FILENAME) 
-        self.canvas.delete(self.canvas_background)
         self.canvas_background = self.canvas.create_image(0, 0, image=self.background, anchor='nw')
+        self.preload_edges()
 
     def setup_background(self, BACKGROUND_FILENAME):
         """Prepare the image to be used as a tkinter background"""
@@ -98,6 +100,21 @@ class Radpath:
         background_image = background_image.resize((int(image_width), int(image_height)), Image.ANTIALIAS)
         return background_image
     
+    def upload_edges(self):
+        """Override the current edges.json with the new edges"""
+        filename = filedialog.askopenfilename()
+        # TODO: Check the file is a json, and if not then give an error message
+        os.remove(os.path.join(data_folder, "edges.json"))
+        shutil.copy(filename, data_folder)
+        old_filename = os.path.join(data_folder, os.path.basename(filename))
+        new_filename = os.path.join(data_folder, "edges.json")
+        os.rename(old_filename, new_filename)
+        self.edges = []
+        self.preload_edges()
+        for loop_drawing in self.loop_drawings:
+            self.canvas.delete(loop_drawing)
+        self.loop_drawings = []
+
     def clear_nodes_and_edges(self):
         """Clear all the drawings"""
         for edge_drawing in self.edge_drawings:
