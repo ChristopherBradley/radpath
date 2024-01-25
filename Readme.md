@@ -1,27 +1,21 @@
 # RadPath
-
-The purpose of this program is to generate a route through an area that covers every path specified, while minimising doing the same path twice (The Chinese Postman Problem).
+This app aims to generate a nice route through every path on a map.
 
 ## Dependencies
 Python 3.9  
-pip install numpy scipy pillow networkx matplotlib  
-For testing: pip install -e .
+pip install numpy scipy pillow networkx matplotlib
+brew install ghostscript
 
 ## Usage
+ 
+* Step 1: Start the program `python src/main.py`
 
-* Step 1: Place the image you want to draw on into the "data" directory with the name "map.png"
+* Step 2: Upload an image of a map with the "Upload Basemap" button
 
-* Step 2: Start the program (python src/main.py)
+* Step 3: Click and drag on the map to draw (or remove) nodes and edges
 
-* Step 3: Click to place circles at any intersections you want
+* Step 4: Click "Generate Route" and wait for the algorithm to finish
 
-* Step 4: Click and drag to draw edges between the intersections
+* Step 5: Click "Download Route" (or take a screenshot) to keep a copy
 
-* Step 5: Press Enter to create a Radpath
-
-
-Other notes:
-- The path will start from the first node you place.
-- You can click on existing nodes or click and drag on existing edges to remove them.
-- After pressing Enter, you can save your radpaths by copying the edges.json file somewhere else.
-- An estimation for the total route distance gets printed when you generate the radpath.
+Happy running!

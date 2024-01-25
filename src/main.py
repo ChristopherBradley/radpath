@@ -7,6 +7,7 @@ import json
 import matplotlib.pyplot as plt
 import shutil
 import os
+import io
 
 from double_edges import choose_double_edges
 from euler_path import euler_path
@@ -25,6 +26,8 @@ class Radpath:
         root.title("Radpath")
 
         # With this current system, you need to enter full screen mode for it to work properly
+        self.map_name = "map"
+        self.distance = 0
         self.screen_width = root.winfo_screenwidth()
         self.screen_height = root.winfo_screenheight()
 
@@ -49,7 +52,10 @@ class Radpath:
         button2.grid(row=0, column=0, padx=10, pady=50, sticky="nw")
         button3 = tk.Button(root, text="Generate Route", command=self.calculate_route, font=button_font, highlightbackground=button_background, height=button_height, width=button_width)
         button3.grid(row=0, column=0, padx=10, pady=90, sticky="nw")
-        self.message_label = tk.Label(root, text="")
+        button4 = tk.Button(root, text="Download Route", command=self.download_route, font=button_font, highlightbackground=button_background, height=button_height, width=button_width)
+        button4.grid(row=0, column=0, padx=10, pady=150, sticky="nw")
+
+        self.message_label = tk.Label(root, text="-----------------------")
         self.message_label.grid(row=0, column=0, padx=10, pady=120, sticky="nw")
 
         self.nodes = []
@@ -71,6 +77,7 @@ class Radpath:
         """Override the current map.png with the new image"""
         filename = filedialog.askopenfilename()
         # TODO: Check the file is a png, and if not then give an error message
+        self.map_name, _ = os.path.splitext(os.path.basename(filename))
         shutil.copy(filename, data_folder)
         old_filename = os.path.join(data_folder, os.path.basename(filename))
         new_filename = os.path.join(data_folder, "map.png")
@@ -114,6 +121,27 @@ class Radpath:
         for loop_drawing in self.loop_drawings:
             self.canvas.delete(loop_drawing)
         self.loop_drawings = []
+
+    def download_route(self):
+        """Download the basemap, edges, and an image of the route itself"""
+        # Name the basemap: map_name.png
+        # Name the edges:   map_name - edges - distance.json
+        # Name the route:   map_name - route - distance.png
+
+        downloads_path = os.path.join(os.path.expanduser("~"), 'Downloads')
+        old_basemap_path = os.path.join(data_folder, "map.png")
+        old_edge_path = os.path.join(data_folder, "edges.json")
+        new_basemap_path = os.path.join(downloads_path, f"{self.map_name}.png")
+        new_edge_path = os.path.join(downloads_path, f"{self.map_name} - edges x{round(self.distance)}.json")
+
+        shutil.copy(old_basemap_path, new_basemap_path)
+        shutil.copy(old_edge_path, new_edge_path)
+
+        new_route_path = os.path.join(downloads_path, f"{self.map_name} - route x{round(self.distance)}.png")
+        ps_data = self.canvas.postscript(colormode='color')
+        pil_image = Image.open(io.BytesIO(ps_data.encode('utf-8')))
+        pil_image.save(new_route_path, format="PNG", quality=95)
+
 
     def clear_nodes_and_edges(self):
         """Clear all the drawings"""
@@ -163,6 +191,7 @@ class Radpath:
             self.loop_drawings = []
             self.clear_nodes_and_edges()
             self.draw_nodes_and_edges()
+            self.distance = 0
 
         node = (event.x, event.y)
         self.new_node = self.overlapping_node(node) is None
@@ -315,7 +344,8 @@ class Radpath:
 
         # Calculate the total length of the path
         route_length = total_length(self.path, self.background.width())
-        self.message_label.config(text=f'distance = map width x {round(route_length, 1)}', bg="#d9ffe0")
+        self.distance = round(route_length, 1)
+        self.message_label.config(text=f'distance = map width x {self.distance}', bg="#d9ffe0")
         
         # Save the edges to file
         with open(EDGES_FILENAME, 'w') as file:
