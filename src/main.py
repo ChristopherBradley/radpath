@@ -5,6 +5,8 @@ from PIL import ImageTk, Image
 import numpy as np
 import json
 import matplotlib.pyplot as plt
+import shutil
+import os
 
 from double_edges import choose_double_edges
 from euler_path import euler_path
@@ -23,29 +25,30 @@ class Radpath:
         root.title("Radpath")
 
         # With this current system, you need to enter full screen mode for it to work properly
-        screen_width = root.winfo_screenwidth()
-        screen_height = root.winfo_screenheight()
+        self.screen_width = root.winfo_screenwidth()
+        self.screen_height = root.winfo_screenheight()
 
-        background_image = Image.open(BACKGROUND_FILENAME)
-        background_image = self.rescale_background(background_image, screen_width, screen_height)
-        self.background = ImageTk.PhotoImage(background_image)
-
-        self.canvas = tk.Canvas(root, width=screen_width, height=screen_height)
+        self.canvas = tk.Canvas(root, width=self.screen_width, height=self.screen_height)
         self.canvas.grid()
         self.canvas.bind('<ButtonPress-1>', self.mouse_press)
         self.canvas.bind('<B1-Motion>', self.mouse_drag)
         self.canvas.bind('<ButtonRelease-1>', self.mouse_release)
         self.canvas.focus_set()
-        self.canvas.create_image(0, 0, image=self.background, anchor='nw')
+
+        self.background = self.setup_background(BACKGROUND_FILENAME) 
+        self.canvas_background = self.canvas.create_image(0, 0, image=self.background, anchor='nw')
 
         button_font = tkFont.Font(size=16, weight='bold')
         button_background = 'black'
         button_height = 1
         button_width = 10
 
+        button1 = tk.Button(root, text="Upload Basemap", command=self.UploadAction, font=button_font, highlightbackground=button_background, height=button_height, width=button_width)
+        button1.grid(row=0, column=0, padx=10, pady=10, sticky="nw")
+
         button3 = tk.Button(root, text="Generate Route", command=self.calculate_route, font=button_font, highlightbackground=button_background, height=button_height, width=button_width)
         button3.grid(row=0, column=0, padx=10, pady=90, sticky="nw")
-        self.message_label = tk.Label(root, text="Testing...", bg="white")
+        self.message_label = tk.Label(root, text="")
         self.message_label.grid(row=0, column=0, padx=10, pady=120, sticky="nw")
 
         self.nodes = []
@@ -63,12 +66,22 @@ class Radpath:
         self.preload_edges()
         root.mainloop()
 
-    def print_hello(self):
-        print("Hello, World!")
-
-    def UploadAction(event=None):
+    def UploadAction(self):
+        """Override the current map.png with the new image"""
         filename = filedialog.askopenfilename()
-        print('Selected:', filename)
+        shutil.copy(filename, data_folder)
+        old_filename = os.path.join(data_folder, os.path.basename(filename))
+        new_filename = os.path.join(data_folder, "map.png")
+        os.rename(old_filename, new_filename)
+        self.background = self.setup_background(BACKGROUND_FILENAME) 
+        self.canvas.delete(self.canvas_background)
+        self.canvas_background = self.canvas.create_image(0, 0, image=self.background, anchor='nw')
+
+    def setup_background(self, BACKGROUND_FILENAME):
+        """Prepare the image to be used as a tkinter background"""
+        background_image = Image.open(BACKGROUND_FILENAME)
+        background_image = self.rescale_background(background_image, self.screen_width, self.screen_height)
+        return ImageTk.PhotoImage(background_image)
 
     def rescale_background(self, background_image, screen_width, screen_height):
         """Adjust the image size to use the full screen width/height but without distorting the image"""
