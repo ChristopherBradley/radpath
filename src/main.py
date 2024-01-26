@@ -104,7 +104,7 @@ class Radpath:
         else:
             image_height = screen_height
             image_width = image_height * image_ratio
-        background_image = background_image.resize((int(image_width), int(image_height)), Image.ANTIALIAS)
+        background_image = background_image.resize((int(image_width), int(image_height)), Image.LANCZOS)
         return background_image
     
     def upload_edges(self):
