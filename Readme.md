@@ -2,12 +2,12 @@
 This app aims to generate a nice route through every path on a map.
 
 ## Setup
-Download miniconda: https://docs.conda.io/projects/miniconda/en/latest/
-Download homebrew: https://brew.sh/
-Create an environment: `conda create --name radpath`
-Activate environment:  `conda activate radpath`
-Install dependencies: `pip install numpy scipy pillow networkx matplotlib` 
-Install ghostscript: `brew install ghostscript`
+Download miniconda: https://docs.conda.io/projects/miniconda/en/latest/  
+Download homebrew: https://brew.sh/  
+Create an environment: `conda create --name radpath`  
+Activate environment:  `conda activate radpath`  
+Install dependencies: `pip install numpy scipy pillow networkx matplotlib`   
+Install ghostscript: `brew install ghostscript`  
 
 ## Usage
  
